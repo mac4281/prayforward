@@ -208,7 +208,7 @@ export const prayForRequest = functions.https.onCall(async (data: any, context?:
         });
 
         // Check if user is anonymous (no email or phone means anonymous)
-        const isAnonymous = !context.auth.token.email && !context.auth.token.phone_number;
+        const isAnonymous = !context.auth?.token?.email && !context.auth?.token?.phone_number;
 
         // Update user stats
         // Note: prayerRequestCredits are granted client-side based on session count (like iOS app)
@@ -321,7 +321,7 @@ export const submitPrayerRequest = functions.https.onCall(async (data: any, cont
         const newGlobalRequestsSubmitted = (globalData?.requestsSubmitted || 0) + 1;
 
         // Check if user is anonymous (no email or phone means anonymous)
-        const isAnonymous = !context.auth.token.email && !context.auth.token.phone_number;
+        const isAnonymous = !context.auth?.token?.email && !context.auth?.token?.phone_number;
         
         // Update user stats
         if (userDoc.exists) {
