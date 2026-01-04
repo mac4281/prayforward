@@ -1,0 +1,139 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Config collection - read-only for authenticated users, write only by Cloud Functions
+    match /config/{document} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only Cloud Functions can write (via Admin SDK)
+    }
+    
+    // Stats collection - read-only for authenticated users, write only by Cloud Functions
+    match /stats/{document} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only Cloud Functions can write (via Admin SDK)
+    }
+    
+    // Users collection - users can read/write their own data
+    // But cannot modify prayersGiven, requestsSubmitted, or personalRatio directly
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId && 
+        // Cannot set protected fields on create
+        !('prayersGiven' in request.resource.data) &&
+        !('requestsSubmitted' in request.resource.data) &&
+        !('personalRatio' in request.resource.data);
+      allow update: if isAuthenticated() && request.auth.uid == userId &&
+        // Cannot modify protected fields
+        (!('prayersGiven' in request.resource.data) || request.resource.data.prayersGiven == resource.data.prayersGiven) &&
+        (!('requestsSubmitted' in request.resource.data) || request.resource.data.requestsSubmitted == resource.data.requestsSubmitted) &&
+        (!('personalRatio' in request.resource.data) || request.resource.data.personalRatio == resource.data.personalRatio);
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Requests collection (new name, replaces prayerRequests)
+    match /requests/{requestId} {
+      // Anyone authenticated can read requests (to pray for them)
+      // Allow both individual document reads and collection queries
+      allow read: if isAuthenticated();
+      
+      // Users can create their own prayer requests
+      // But cannot set targetPrayerNum, status, or prayerCount
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        // Required fields
+        'text' in request.resource.data &&
+        'bucket' in request.resource.data &&
+        // Cannot set protected fields
+        !('targetPrayerNum' in request.resource.data) &&
+        !('status' in request.resource.data) &&
+        !('prayerCount' in request.resource.data);
+      
+      // Users can update their own requests, but not protected fields
+      // No one can update targetPrayerNum, status, or prayerCount from client
+      allow update: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid &&
+        // Cannot modify protected fields
+        (!('targetPrayerNum' in request.resource.data) || request.resource.data.targetPrayerNum == resource.data.targetPrayerNum) &&
+        (!('status' in request.resource.data) || request.resource.data.status == resource.data.status) &&
+        (!('prayerCount' in request.resource.data) || request.resource.data.prayerCount == resource.data.prayerCount) &&
+        (!('bucket' in request.resource.data) || request.resource.data.bucket == resource.data.bucket) &&
+        // Cannot change userId
+        (!('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId);
+      
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Prayer requests collection (legacy - for backward compatibility)
+    match /prayerRequests/{requestId} {
+      // Anyone authenticated can read prayer requests (to pray for them)
+      allow read: if isAuthenticated();
+      // Users can create their own prayer requests
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Users can update/delete their own prayer requests
+      // Also allow any authenticated user to update bucket and prayerCount fields (when prayers are submitted)
+      allow update: if isAuthenticated() && (
+        // Owner can update anything
+        resource.data.userId == request.auth.uid ||
+        // Any authenticated user can update prayerCount and bucket, but cannot change userId or request
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['userId', 'request']))
+      );
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Prayers collection
+    match /prayers/{prayerId} {
+      // Users can read all prayers (to see prayers for their requests)
+      allow read: if isAuthenticated();
+      // Users can create prayers
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Users can update/delete their own prayers
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Companies collection (for business advertisements)
+    match /companies/{companyId} {
+      // Any authenticated user can read active companies (to display ads)
+      allow read: if isAuthenticated();
+      // Only allow updating lastShown, views, and linkedClicked fields (for tracking ad views and clicks)
+      allow update: if isAuthenticated() && (
+        // Ensure critical fields haven't changed (if they exist)
+        (!('name' in request.resource.data) || !('name' in resource.data) || request.resource.data.name == resource.data.name) &&
+        (!('img' in request.resource.data) || !('img' in resource.data) || request.resource.data.img == resource.data.img) &&
+        (!('imageUrl' in request.resource.data) || !('imageUrl' in resource.data) || request.resource.data.imageUrl == resource.data.imageUrl) &&
+        (!('url' in request.resource.data) || !('url' in resource.data) || request.resource.data.url == resource.data.url) &&
+        (!('active' in request.resource.data) || !('active' in resource.data) || request.resource.data.active == resource.data.active) &&
+        // Only allow updating tracking fields - check that changed keys are only tracking fields
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['name', 'img', 'imageUrl', 'url', 'active', 'createdAt'])
+      );
+      // Do not allow create or delete (only admins should manage companies via console)
+      allow create, delete: if false;
+    }
+    
+    // Company requests collection (for companies to submit partnership requests)
+    match /companyRequests/{requestId} {
+      // Only admins can read company requests (for review)
+      allow read: if false; // Only Cloud Functions/Admin SDK can read
+      // Any authenticated user (including anonymous) can create company requests
+      allow create: if isAuthenticated() &&
+        // Required fields
+        'companyName' in request.resource.data &&
+        'contactName' in request.resource.data &&
+        'email' in request.resource.data &&
+        'phone' in request.resource.data &&
+        'url' in request.resource.data &&
+        'date' in request.resource.data;
+      // Only admins can update/delete (via Admin SDK)
+      allow update, delete: if false;
+    }
+  }
+}
