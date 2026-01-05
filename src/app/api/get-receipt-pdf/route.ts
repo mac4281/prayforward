@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
           // Try as a charge ID to find the invoice
           try {
             const charge = await stripe.charges.retrieve(receiptId);
-            if (charge.invoice) {
-              invoiceId = typeof charge.invoice === 'string' ? charge.invoice : charge.invoice.id;
+            if ('invoice' in charge && charge.invoice) {
+              invoiceId = typeof charge.invoice === 'string' ? charge.invoice : (charge.invoice as any).id;
             }
           } catch {
             return NextResponse.json(
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
       // For one-time payments, try to find the invoice from the charge
       try {
         const charge = await stripe.charges.retrieve(receiptId);
-        if (charge.invoice) {
-          invoiceId = typeof charge.invoice === 'string' ? charge.invoice : charge.invoice.id;
+        if ('invoice' in charge && charge.invoice) {
+          invoiceId = typeof charge.invoice === 'string' ? charge.invoice : (charge.invoice as any).id;
         } else {
           // If no invoice, try to get from payment intent
           if (charge.payment_intent) {
@@ -88,10 +88,10 @@ export async function POST(request: NextRequest) {
               ? await stripe.paymentIntents.retrieve(charge.payment_intent)
               : charge.payment_intent;
             
-            if (paymentIntent.invoice) {
+            if ('invoice' in paymentIntent && paymentIntent.invoice) {
               invoiceId = typeof paymentIntent.invoice === 'string' 
                 ? paymentIntent.invoice 
-                : paymentIntent.invoice.id;
+                : (paymentIntent.invoice as any).id;
             }
           }
         }
@@ -106,10 +106,10 @@ export async function POST(request: NextRequest) {
               ? await stripe.paymentIntents.retrieve(session.payment_intent)
               : session.payment_intent;
             
-            if (paymentIntent.invoice) {
+            if ('invoice' in paymentIntent && paymentIntent.invoice) {
               invoiceId = typeof paymentIntent.invoice === 'string'
                 ? paymentIntent.invoice
-                : paymentIntent.invoice.id;
+                : (paymentIntent.invoice as any).id;
             }
           }
         } catch {

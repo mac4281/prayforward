@@ -200,6 +200,19 @@ export default function ProfilePage() {
   }
 
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#F5F5DC]">
+        <Navbar />
+        <main className="flex-1 px-4 md:px-6 py-8 max-w-4xl mx-auto w-full flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-[#3D2817] text-lg">Loading...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F5DC]">
       <Navbar />

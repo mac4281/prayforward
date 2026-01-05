@@ -82,7 +82,14 @@ export async function POST(request: NextRequest) {
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;
-      const subscriptionId = invoice.subscription as string;
+      const subscriptionId = ('subscription' in invoice && invoice.subscription) 
+        ? (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as any).id) 
+        : null;
+      
+      if (!subscriptionId) {
+        console.error('No subscription ID found in invoice');
+        return NextResponse.json({ received: true });
+      }
       
       // Fetch subscription to get metadata
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
               amount: invoice.amount_paid,
               type: 'subscription',
               date: new Date(invoice.created * 1000).toISOString(),
-              stripeSessionId: invoice.subscription,
+              stripeSessionId: ('subscription' in invoice && invoice.subscription) ? (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as any).id) : undefined,
               status: invoice.status,
               invoiceId: invoice.id, // Invoice ID for PDF download
             });
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
             date: new Date(charge.created * 1000).toISOString(),
             stripeSessionId: charge.payment_intent,
             status: charge.status,
-            invoiceId: typeof charge.invoice === 'string' ? charge.invoice : charge.invoice?.id,
+            invoiceId: ('invoice' in charge && charge.invoice) ? (typeof charge.invoice === 'string' ? charge.invoice : (charge.invoice as any).id) : undefined,
           });
         }
       }
@@ -107,10 +107,10 @@ export async function POST(request: NextRequest) {
               ? await stripe.paymentIntents.retrieve(session.payment_intent)
               : session.payment_intent;
             
-            if (paymentIntent.invoice) {
+            if ('invoice' in paymentIntent && paymentIntent.invoice) {
               invoiceId = typeof paymentIntent.invoice === 'string'
                 ? paymentIntent.invoice
-                : paymentIntent.invoice.id;
+                : (paymentIntent.invoice as any).id;
             }
           } catch {
             // Ignore errors
