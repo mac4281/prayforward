@@ -1,7 +1,26 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export default function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!auth) return;
+
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <nav className="bg-[#40E0D0] w-full px-4 py-4 md:py-6 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -45,10 +64,16 @@ export default function Navbar() {
           </Link>
         </div>
         
-        {/* Right side - iOS App Download Link */}
-        <div className="flex justify-end">
+        {/* Right side - Account link and App Store */}
+        <div className="flex items-center gap-3">
           <Link
-            href="https://apps.apple.com/app/pray-it-forward/id6739782000"
+            href="/profile"
+            className="text-[#3D2817] font-bold text-sm md:text-base hover:underline"
+          >
+            Account
+          </Link>
+          <Link
+            href="https://apps.apple.com/us/app/pray-it-forward/id6757207986"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center"
@@ -68,4 +93,3 @@ export default function Navbar() {
     </nav>
   );
 }
-

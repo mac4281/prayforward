@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 interface PaymentOption {
   label: string;
@@ -8,20 +10,38 @@ interface PaymentOption {
 }
 
 const oneTimeAmounts: PaymentOption[] = [
-  { label: '$1', amount: 1 },
   { label: '$5', amount: 5 },
+  { label: '$10', amount: 10 },
   { label: '$25', amount: 25 },
   { label: '$50', amount: 50 },
   { label: '$100', amount: 100 },
   { label: 'Other', amount: null },
 ];
 
+const monthlyAmounts: PaymentOption[] = [
+  { label: '$5/month', amount: 5 },
+  { label: '$10/month', amount: 10 },
+  { label: '$25/month', amount: 25 },
+  { label: 'Other', amount: null },
+];
+
 export default function SupportForm() {
   const [paymentType, setPaymentType] = useState<'subscription' | 'one-time'>('one-time');
   const [selectedAmount, setSelectedAmount] = useState<number | null>(5);
+  const [selectedMonthlyAmount, setSelectedMonthlyAmount] = useState<number | null>(5);
   const [customAmount, setCustomAmount] = useState('');
+  const [customMonthlyAmount, setCustomMonthlyAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +50,17 @@ export default function SupportForm() {
     let amount: number;
 
     if (paymentType === 'subscription') {
-      amount = 5; // $5/month
+      if (selectedMonthlyAmount === null) {
+        // Custom monthly amount
+        const parsed = parseFloat(customMonthlyAmount);
+        if (isNaN(parsed) || parsed <= 0) {
+          setError('Please enter a valid monthly amount');
+          return;
+        }
+        amount = parsed;
+      } else {
+        amount = selectedMonthlyAmount;
+      }
     } else {
       if (selectedAmount === null) {
         // Custom amount
@@ -57,6 +87,7 @@ export default function SupportForm() {
         body: JSON.stringify({
           paymentType,
           amount: amount * 100, // Convert to cents
+          userId: user?.uid || null, // Include user ID if logged in
         }),
       });
 
@@ -114,7 +145,7 @@ export default function SupportForm() {
                 onChange={(e) => setPaymentType(e.target.value as 'one-time')}
                 className="mr-2"
               />
-              <span className="text-[#3D2817]">One-time</span>
+              <span className="text-[#3D2817]">One-Time Giving</span>
             </label>
             <label className="flex items-center">
               <input
@@ -125,7 +156,7 @@ export default function SupportForm() {
                 onChange={(e) => setPaymentType(e.target.value as 'subscription')}
                 className="mr-2"
               />
-              <span className="text-[#3D2817]">Monthly ($5/month)</span>
+              <span className="text-[#3D2817]">Monthly Support</span>
             </label>
           </div>
         </div>
@@ -178,10 +209,54 @@ export default function SupportForm() {
         )}
 
         {paymentType === 'subscription' && (
-          <div className="bg-[#F5F5DC] p-4 rounded-lg">
-            <p className="text-[#3D2817] font-medium">
-              You'll be charged $5.00 per month. You can cancel anytime.
-            </p>
+          <div>
+            <label className="block text-[#3D2817] font-medium mb-3">
+              Select Monthly Amount
+            </label>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {monthlyAmounts.map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => {
+                    setSelectedMonthlyAmount(option.amount);
+                    setCustomMonthlyAmount('');
+                  }}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                    selectedMonthlyAmount === option.amount
+                      ? 'bg-[#40E0D0] text-[#3D2817] border-2 border-[#3D2817]'
+                      : 'bg-white text-[#3D2817] border border-[#3D2817]/20 hover:bg-[#F5F5DC]'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {selectedMonthlyAmount === null && (
+              <div>
+                <label htmlFor="customMonthlyAmount" className="block text-[#3D2817] font-medium mb-2">
+                  Enter Monthly Amount ($)
+                </label>
+                <input
+                  id="customMonthlyAmount"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={customMonthlyAmount}
+                  onChange={(e) => setCustomMonthlyAmount(e.target.value)}
+                  placeholder="Enter monthly amount"
+                  className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                  required={selectedMonthlyAmount === null}
+                />
+              </div>
+            )}
+            
+            <div className="bg-[#F5F5DC] p-4 rounded-lg mt-4">
+              <p className="text-[#3D2817] text-sm">
+                You can cancel your subscription anytime.
+              </p>
+            </div>
           </div>
         )}
 
@@ -193,10 +268,19 @@ export default function SupportForm() {
 
         <button
           type="submit"
-          disabled={isProcessing || (paymentType === 'one-time' && selectedAmount === null && !customAmount)}
+          disabled={
+            isProcessing || 
+            (paymentType === 'one-time' && selectedAmount === null && !customAmount) ||
+            (paymentType === 'subscription' && selectedMonthlyAmount === null && !customMonthlyAmount)
+          }
           className="w-full bg-[#3D2817] text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-[#2a1c10] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isProcessing ? 'Processing...' : paymentType === 'subscription' ? 'Subscribe for $5/month' : `Donate $${selectedAmount === null ? customAmount || '0' : selectedAmount}`}
+          {isProcessing 
+            ? 'Processing...' 
+            : paymentType === 'subscription' 
+              ? `Subscribe for $${selectedMonthlyAmount === null ? customMonthlyAmount || '0' : selectedMonthlyAmount}/month`
+              : `Donate $${selectedAmount === null ? customAmount || '0' : selectedAmount}`
+          }
         </button>
       </form>
     </div>

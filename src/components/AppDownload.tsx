@@ -8,7 +8,7 @@ export default function AppDownload() {
         Download the app here
       </p>
       <Link
-        href="https://apps.apple.com/app/pray-it-forward/id6739782000"
+        href="https://apps.apple.com/us/app/pray-it-forward/id6757207986"
         target="_blank"
         rel="noopener noreferrer"
         className="inline-block"

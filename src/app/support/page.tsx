@@ -19,7 +19,6 @@ function SupportPageContent() {
     if (success === 'true') {
       setShowSuccessModal(true);
     } else if (canceled === 'true') {
-      // Optionally show a cancel message
       console.log('Payment was canceled');
     }
   }, [searchParams]);

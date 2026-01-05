@@ -23,7 +23,7 @@ export default function Home() {
             {/* App Download Button */}
             <div className="flex justify-center mb-8">
               <Link
-                href="https://apps.apple.com/app/pray-it-forward/id6739782000"
+                href="https://apps.apple.com/us/app/pray-it-forward/id6757207986"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block"
@@ -192,7 +192,7 @@ export default function Home() {
               Download the app today and join our growing community of prayer warriors working together to prove the power of prayer through technology.
             </p>
             <Link
-              href="https://apps.apple.com/app/pray-it-forward/id6739782000"
+              href="https://apps.apple.com/us/app/pray-it-forward/id6757207986"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block"

@@ -24,17 +24,15 @@ service cloud.firestore {
     }
     
     // Users collection - users can read/write their own data
-    // But cannot modify prayersGiven, requestsSubmitted, or personalRatio directly
+    // But cannot modify prayersCompleted, requestsSubmitted, or personalRatio directly
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.auth.uid == userId && 
-        // Cannot set protected fields on create
-        !('prayersGiven' in request.resource.data) &&
-        !('requestsSubmitted' in request.resource.data) &&
-        !('personalRatio' in request.resource.data);
+      // Allow users to create their own document (for registration)
+      // Protected fields will be managed by Cloud Functions
+      allow create: if isAuthenticated() && request.auth.uid == userId;
       allow update: if isAuthenticated() && request.auth.uid == userId &&
-        // Cannot modify protected fields
-        (!('prayersGiven' in request.resource.data) || request.resource.data.prayersGiven == resource.data.prayersGiven) &&
+        // Cannot modify protected fields (must match existing values)
+        (!('prayersCompleted' in request.resource.data) || request.resource.data.prayersCompleted == resource.data.prayersCompleted) &&
         (!('requestsSubmitted' in request.resource.data) || request.resource.data.requestsSubmitted == resource.data.requestsSubmitted) &&
         (!('personalRatio' in request.resource.data) || request.resource.data.personalRatio == resource.data.personalRatio);
       allow delete: if isAuthenticated() && request.auth.uid == userId;
@@ -134,6 +132,14 @@ service cloud.firestore {
         'date' in request.resource.data;
       // Only admins can update/delete (via Admin SDK)
       allow update, delete: if false;
+    }
+    
+    // Receipts collection - users can read their own receipts
+    match /receipts/{receiptId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false; // Only admins can update/delete
     }
   }
 }

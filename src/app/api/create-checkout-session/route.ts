@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-});
+function getStripe() {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  
+  if (!stripeSecretKey) {
+    throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
+  }
+  
+  return new Stripe(stripeSecretKey, {
+    apiVersion: '2025-12-15.clover',
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { paymentType, amount } = await request.json();
+    const { paymentType, amount, userId } = await request.json();
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -18,6 +26,16 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://prayforward.org';
 
+    const stripe = getStripe();
+    
+    // Metadata to store user info and payment type
+    const metadata: Record<string, string> = {
+      paymentType,
+    };
+    if (userId) {
+      metadata.userId = userId;
+    }
+    
     if (paymentType === 'subscription') {
       // Create subscription checkout session
       const session = await stripe.checkout.sessions.create({
@@ -39,7 +57,8 @@ export async function POST(request: NextRequest) {
             quantity: 1,
           },
         ],
-        success_url: `${baseUrl}/support?success=true`,
+        metadata,
+        success_url: `${baseUrl}/support?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/support?canceled=true`,
       });
 
@@ -62,7 +81,8 @@ export async function POST(request: NextRequest) {
             quantity: 1,
           },
         ],
-        success_url: `${baseUrl}/support?success=true`,
+        metadata,
+        success_url: `${baseUrl}/support?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/support?canceled=true`,
       });
 
