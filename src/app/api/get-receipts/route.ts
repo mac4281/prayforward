@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
 
     const stripe = getStripe();
     const receipts: any[] = [];
+    const activeSubscriptions: any[] = [];
 
     // Fetch checkout sessions for this user
     // We'll search by customer email since we store userId in metadata
@@ -47,9 +48,23 @@ export async function POST(request: NextRequest) {
       const subscriptions = await stripe.subscriptions.list({
         customer: customer.id,
         limit: 100,
+        status: 'all', // Get all subscriptions (active, canceled, etc.)
       });
 
       for (const subscription of subscriptions.data) {
+        // Add active subscriptions to separate array
+        if (subscription.status === 'active' || subscription.status === 'trialing') {
+          const price = subscription.items.data[0]?.price;
+          activeSubscriptions.push({
+            id: subscription.id,
+            subscriptionId: subscription.id,
+            amount: price?.unit_amount || 0,
+            status: subscription.status,
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          });
+        }
+
         // Get invoices for this subscription
         const invoices = await stripe.invoices.list({
           subscription: subscription.id,
@@ -64,6 +79,7 @@ export async function POST(request: NextRequest) {
               type: 'subscription',
               date: new Date(invoice.created * 1000).toISOString(),
               stripeSessionId: ('subscription' in invoice && invoice.subscription) ? (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as any).id) : undefined,
+              subscriptionId: subscription.id,
               status: invoice.status,
               invoiceId: invoice.id, // Invoice ID for PDF download
             });
@@ -132,7 +148,7 @@ export async function POST(request: NextRequest) {
     // Sort by date (newest first) - convert to Date for sorting
     receipts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    return NextResponse.json({ receipts });
+    return NextResponse.json({ receipts, activeSubscriptions });
   } catch (error: any) {
     console.error('Error fetching receipts:', error);
     return NextResponse.json(

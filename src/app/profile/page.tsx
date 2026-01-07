@@ -17,16 +17,28 @@ interface Receipt {
   stripeSessionId?: string;
   status?: string;
   invoiceId?: string;
+  subscriptionId?: string;
+}
+
+interface ActiveSubscription {
+  id: string;
+  subscriptionId: string;
+  amount: number;
+  status: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
 }
 
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [activeSubscriptions, setActiveSubscriptions] = useState<ActiveSubscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
   const [loadingReceipts, setLoadingReceipts] = useState(false);
   const [downloadingReceipt, setDownloadingReceipt] = useState<string | null>(null);
+  const [cancelingSubscription, setCancelingSubscription] = useState<string | null>(null);
   const [userStats, setUserStats] = useState<{
     personalRatio?: number;
     prayerRequestCredits?: number;
@@ -92,6 +104,8 @@ export default function ProfilePage() {
                   date: receipt.date ? new Date(receipt.date) : new Date(),
                 }));
               setReceipts(receiptsWithDates);
+              // Set active subscriptions
+              setActiveSubscriptions(data.activeSubscriptions || []);
             } else {
               console.error('Error fetching receipts:', await response.text());
             }
@@ -103,6 +117,7 @@ export default function ProfilePage() {
         } else {
           // Anonymous user - no receipts
           setReceipts([]);
+          setActiveSubscriptions([]);
           setLoadingReceipts(false);
         }
       } else {
@@ -183,6 +198,57 @@ export default function ProfilePage() {
       alert('Failed to download receipt. Please try again.');
     } finally {
       setDownloadingReceipt(null);
+    }
+  };
+
+  const handleCancelSubscription = async (subscription: ActiveSubscription) => {
+    if (!user?.email) {
+      alert('You must be logged in to cancel a subscription.');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to cancel this subscription? It will remain active until the end of the current billing period.')) {
+      return;
+    }
+
+    setCancelingSubscription(subscription.id);
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscriptionId: subscription.subscriptionId,
+          userEmail: user.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Refresh subscriptions
+        const receiptsResponse = await fetch('/api/get-receipts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.uid,
+            userEmail: user.email,
+          }),
+        });
+
+        if (receiptsResponse.ok) {
+          const receiptsData = await receiptsResponse.json();
+          setActiveSubscriptions(receiptsData.activeSubscriptions || []);
+        }
+
+        alert('Subscription will be canceled at the end of the current billing period.');
+      } else {
+        alert(data.error || 'Failed to cancel subscription. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      alert('Failed to cancel subscription. Please try again.');
+    } finally {
+      setCancelingSubscription(null);
     }
   };
 
@@ -298,6 +364,102 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* Active Subscriptions - Only show for authenticated (non-anonymous) users */}
+        {user.email && (
+          <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border border-[#3D2817]/10 mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#3D2817] mb-6">
+              Active Subscriptions
+            </h2>
+
+            {loadingReceipts ? (
+              <div className="text-center py-12">
+                <p className="text-[#3D2817] text-lg">Loading subscriptions...</p>
+              </div>
+            ) : activeSubscriptions.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-[#3D2817] text-lg mb-4">No active subscriptions</p>
+                <p className="text-[#3D2817]/70 text-sm mb-6">
+                  Your active monthly subscriptions will appear here.
+                </p>
+                <Link
+                  href="/support"
+                  className="inline-block bg-[#3D2817] text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-[#2a1c10] transition-colors"
+                >
+                  Start Monthly Support
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {activeSubscriptions.map((subscription) => (
+                  <div
+                    key={subscription.id}
+                    className="border border-[#3D2817]/20 rounded-lg p-4 hover:bg-[#F5F5DC] transition-colors"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-semibold text-[#3D2817]">
+                            Monthly Support
+                          </h3>
+                          {subscription.cancelAtPeriodEnd ? (
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                              Canceling
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+                              Active
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[#3D2817]/70 text-sm">
+                          Next billing date: {formatDate(subscription.currentPeriodEnd)}
+                        </p>
+                        {subscription.cancelAtPeriodEnd && (
+                          <p className="text-[#3D2817]/70 text-sm mt-1">
+                            Will cancel on: {formatDate(subscription.currentPeriodEnd)}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-[#3D2817]">
+                          {formatAmount(subscription.amount)}
+                        </p>
+                        <p className="text-sm text-[#3D2817]/70">per month</p>
+                      </div>
+                    </div>
+                    {!subscription.cancelAtPeriodEnd && (
+                      <div className="mt-4 pt-4 border-t border-[#3D2817]/10">
+                        <button
+                          onClick={() => handleCancelSubscription(subscription)}
+                          disabled={cancelingSubscription === subscription.id}
+                          className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {cancelingSubscription === subscription.id ? (
+                            <>
+                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              <span className="text-sm font-medium">Canceling...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              <span className="text-sm font-medium">Cancel Subscription</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Purchase Receipts - Only show for authenticated (non-anonymous) users */}
         {user.email && (
