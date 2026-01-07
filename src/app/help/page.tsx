@@ -29,7 +29,7 @@ export default function HelpPage() {
                 <p className="mb-4">
                   <a 
                     href="mailto:support@prayforward.org" 
-                    className="text-[#40E0D0] hover:underline font-medium"
+                    className="text-[#05ebfa] hover:underline font-medium"
                   >
                     support@prayforward.org
                   </a>
@@ -97,7 +97,7 @@ export default function HelpPage() {
                     If you encounter inappropriate content, please contact us immediately at{' '}
                     <a 
                       href="mailto:support@prayforward.org" 
-                      className="text-[#40E0D0] hover:underline"
+                      className="text-[#05ebfa] hover:underline"
                     >
                       support@prayforward.org
                     </a>
@@ -112,7 +112,7 @@ export default function HelpPage() {
                     information. See our{' '}
                     <a 
                       href="/privacy" 
-                      className="text-[#40E0D0] hover:underline"
+                      className="text-[#05ebfa] hover:underline"
                     >
                       Privacy Policy
                     </a>
@@ -138,7 +138,7 @@ export default function HelpPage() {
                 If problems persist, please contact us at{' '}
                 <a 
                   href="mailto:support@prayforward.org" 
-                  className="text-[#40E0D0] hover:underline font-medium"
+                  className="text-[#05ebfa] hover:underline font-medium"
                 >
                   support@prayforward.org
                 </a>
@@ -153,7 +153,7 @@ export default function HelpPage() {
                 feature requests, or general feedback at{' '}
                 <a 
                   href="mailto:support@prayforward.org" 
-                  className="text-[#40E0D0] hover:underline font-medium"
+                  className="text-[#05ebfa] hover:underline font-medium"
                 >
                   support@prayforward.org
                 </a>
@@ -168,4 +168,5 @@ export default function HelpPage() {
     </div>
   );
 }
+
 

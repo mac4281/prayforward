@@ -121,7 +121,7 @@ export default function PrayerForm({ requestId, onSuccess }: PrayerFormProps) {
           onChange={(e) => setPrayerText(e.target.value)}
           placeholder="Enter your prayer here..."
           rows={6}
-          className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent resize-none text-[#3D2817] bg-white"
+          className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent resize-none text-[#3D2817] bg-white"
           disabled={isSubmitting}
         />
       </div>

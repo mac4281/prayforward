@@ -38,3 +38,4 @@ The script needs Firebase Admin credentials to write to Firestore. Here's how to
 
 ⚠️ **Never commit `serviceAccountKey.json` to git!** It contains sensitive credentials that give full access to your Firebase project.
 
+

@@ -75,7 +75,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                 required
                 disabled={isLoading}
               />
@@ -91,7 +91,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                 required
                 disabled={isLoading}
               />
@@ -121,7 +121,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-[#3D2817] text-sm">
               Don't have an account?{' '}
-              <Link href="/register" className="text-[#40E0D0] font-semibold hover:underline">
+              <Link href="/register" className="text-[#05ebfa] font-semibold hover:underline">
                 Sign up
               </Link>
             </p>

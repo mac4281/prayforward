@@ -49,7 +49,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="bg-[#40E0D0] w-full px-4 py-4 md:py-6 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-[#05ebfa] w-full px-4 py-4 md:py-6 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo - Left */}
           <Link href="/" className="flex-shrink-0" onClick={closeMobileMenu}>
@@ -171,7 +171,7 @@ export default function Navbar() {
           onClick={closeMobileMenu}
         >
           <div
-            className="bg-[#40E0D0] w-full h-full overflow-y-auto"
+            className="bg-[#05ebfa] w-full h-full overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-4 py-6 space-y-4">

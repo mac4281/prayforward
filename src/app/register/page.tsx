@@ -167,7 +167,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                 disabled={isLoading}
               />
             </div>
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                 required
                 disabled={isLoading}
               />
@@ -198,7 +198,7 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                 required
                 minLength={6}
                 disabled={isLoading}
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm your password"
-                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                 required
                 minLength={6}
                 disabled={isLoading}
@@ -240,7 +240,7 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-[#3D2817] text-sm">
               Already have an account?{' '}
-              <Link href="/login" className="text-[#40E0D0] font-semibold hover:underline">
+              <Link href="/login" className="text-[#05ebfa] font-semibold hover:underline">
                 Sign in
               </Link>
             </p>

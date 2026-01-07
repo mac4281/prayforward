@@ -7,21 +7,21 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
           <Link
             href="/help"
-            className="text-sm md:text-base hover:text-[#40E0D0] transition-colors underline"
+            className="text-sm md:text-base hover:text-[#05ebfa] transition-colors underline"
           >
             Help & Support
           </Link>
-          <span className="hidden md:inline text-[#40E0D0]">|</span>
+          <span className="hidden md:inline text-[#05ebfa]">|</span>
           <Link
             href="/privacy"
-            className="text-sm md:text-base hover:text-[#40E0D0] transition-colors underline"
+            className="text-sm md:text-base hover:text-[#05ebfa] transition-colors underline"
           >
             Privacy Policy
           </Link>
-          <span className="hidden md:inline text-[#40E0D0]">|</span>
+          <span className="hidden md:inline text-[#05ebfa]">|</span>
           <Link
             href="/terms"
-            className="text-sm md:text-base hover:text-[#40E0D0] transition-colors underline"
+            className="text-sm md:text-base hover:text-[#05ebfa] transition-colors underline"
           >
             Terms of Service
           </Link>

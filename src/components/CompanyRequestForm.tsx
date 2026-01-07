@@ -93,7 +93,7 @@ export default function CompanyRequestForm() {
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             placeholder="Enter company name"
-            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
             disabled={isSubmitting}
             required
           />
@@ -109,7 +109,7 @@ export default function CompanyRequestForm() {
             value={contactName}
             onChange={(e) => setContactName(e.target.value)}
             placeholder="Enter contact name"
-            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
             disabled={isSubmitting}
             required
           />
@@ -125,7 +125,7 @@ export default function CompanyRequestForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="contact@example.com"
-            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
             disabled={isSubmitting}
             required
           />
@@ -141,7 +141,7 @@ export default function CompanyRequestForm() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="(555) 123-4567"
-            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
             disabled={isSubmitting}
             required
           />
@@ -157,7 +157,7 @@ export default function CompanyRequestForm() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://example.com"
-            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+            className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
             disabled={isSubmitting}
             required
           />

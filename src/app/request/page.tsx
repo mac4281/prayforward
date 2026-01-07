@@ -159,7 +159,7 @@ export default function RequestPage() {
 
           {!canSubmitRequest ? (
             <div className="space-y-6">
-              <div className="bg-[#40E0D0]/20 border border-[#40E0D0] rounded-lg p-4">
+              <div className="bg-[#05ebfa]/20 border border-[#05ebfa] rounded-lg p-4">
                 <p className="text-[#3D2817] text-base md:text-lg leading-relaxed">
                   To submit a prayer request, you need to either:
                 </p>
@@ -201,7 +201,7 @@ export default function RequestPage() {
                     onChange={(e) => setPrayerText(e.target.value)}
                     placeholder="Enter your prayer request here..."
                     rows={8}
-                    className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent resize-none text-[#3D2817] bg-white"
+                    className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent resize-none text-[#3D2817] bg-white"
                     disabled={isSubmitting}
                     required
                   />

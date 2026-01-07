@@ -117,7 +117,7 @@ export default function SupportForm() {
       </h2>
       
       {/* 501c3 Information */}
-      <div className="bg-[#40E0D0]/20 border border-[#40E0D0] rounded-lg p-4 mb-6">
+      <div className="bg-[#05ebfa]/20 border border-[#05ebfa] rounded-lg p-4 mb-6">
         <p className="text-[#3D2817] text-sm md:text-base leading-relaxed">
           <strong>Pray It Forward</strong> is a US recognized <strong>501(c)(3) non-profit organization</strong>. 
           Your donations are tax-deductible to the extent allowed by law. Thank you for supporting our mission 
@@ -178,7 +178,7 @@ export default function SupportForm() {
                   }}
                   className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
                     selectedAmount === option.amount
-                      ? 'bg-[#40E0D0] text-[#3D2817] border-2 border-[#3D2817]'
+                      ? 'bg-[#05ebfa] text-[#3D2817] border-2 border-[#3D2817]'
                       : 'bg-white text-[#3D2817] border border-[#3D2817]/20 hover:bg-[#F5F5DC]'
                   }`}
                 >
@@ -200,7 +200,7 @@ export default function SupportForm() {
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                  className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                   required={selectedAmount === null}
                 />
               </div>
@@ -224,7 +224,7 @@ export default function SupportForm() {
                   }}
                   className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
                     selectedMonthlyAmount === option.amount
-                      ? 'bg-[#40E0D0] text-[#3D2817] border-2 border-[#3D2817]'
+                      ? 'bg-[#05ebfa] text-[#3D2817] border-2 border-[#3D2817]'
                       : 'bg-white text-[#3D2817] border border-[#3D2817]/20 hover:bg-[#F5F5DC]'
                   }`}
                 >
@@ -246,7 +246,7 @@ export default function SupportForm() {
                   value={customMonthlyAmount}
                   onChange={(e) => setCustomMonthlyAmount(e.target.value)}
                   placeholder="Enter monthly amount"
-                  className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40E0D0] focus:border-transparent text-[#3D2817] bg-white"
+                  className="w-full px-4 py-3 border border-[#3D2817]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#05ebfa] focus:border-transparent text-[#3D2817] bg-white"
                   required={selectedMonthlyAmount === null}
                 />
               </div>

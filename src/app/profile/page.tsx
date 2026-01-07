@@ -247,14 +247,14 @@ export default function ProfilePage() {
 
           {/* Login/Register for Anonymous Users */}
           {!user.email && (
-            <div className="mb-6 p-4 bg-[#40E0D0]/10 rounded-lg border border-[#40E0D0]/20">
+            <div className="mb-6 p-4 bg-[#05ebfa]/10 rounded-lg border border-[#05ebfa]/20">
               <p className="text-[#3D2817] mb-4">
                 Link your account to an email and password to keep your data safe and access your receipts.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   href="/login"
-                  className="flex-1 bg-[#40E0D0] text-[#3D2817] px-6 py-3 rounded-lg font-semibold hover:bg-[#30c0b0] transition-colors text-center"
+                  className="flex-1 bg-[#05ebfa] text-[#3D2817] px-6 py-3 rounded-lg font-semibold hover:bg-[#04c4d0] transition-colors text-center"
                 >
                   Log In
                 </Link>
@@ -368,7 +368,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => handleDownloadReceipt(receipt)}
                       disabled={downloadingReceipt === receipt.id}
-                      className="flex items-center gap-2 text-[#3D2817] hover:text-[#40E0D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 text-[#3D2817] hover:text-[#05ebfa] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {downloadingReceipt === receipt.id ? (
                         <>

@@ -35,7 +35,7 @@ function SupportPageContent() {
               onClick={() => setActiveTab('company')}
               className={`flex-1 px-6 py-4 text-center font-semibold transition-colors ${
                 activeTab === 'company'
-                  ? 'bg-[#40E0D0] text-[#3D2817] border-b-2 border-[#3D2817]'
+                  ? 'bg-[#05ebfa] text-[#3D2817] border-b-2 border-[#3D2817]'
                   : 'text-[#3D2817] hover:bg-[#F5F5DC]'
               }`}
             >
@@ -45,7 +45,7 @@ function SupportPageContent() {
               onClick={() => setActiveTab('support')}
               className={`flex-1 px-6 py-4 text-center font-semibold transition-colors ${
                 activeTab === 'support'
-                  ? 'bg-[#40E0D0] text-[#3D2817] border-b-2 border-[#3D2817]'
+                  ? 'bg-[#05ebfa] text-[#3D2817] border-b-2 border-[#3D2817]'
                   : 'text-[#3D2817] hover:bg-[#F5F5DC]'
               }`}
             >

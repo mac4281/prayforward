@@ -81,7 +81,7 @@ export default function ShareButton({ requestId, prayerText }: ShareButtonProps)
     <button
       onClick={handleShare}
       disabled={sharing}
-      className="flex items-center gap-2 px-4 py-2 bg-[#40E0D0] text-[#3D2817] rounded-lg font-semibold hover:bg-[#30c0b0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="flex items-center gap-2 px-4 py-2 bg-[#05ebfa] text-[#3D2817] rounded-lg font-semibold hover:bg-[#04c4d0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {sharing ? (
         <>
