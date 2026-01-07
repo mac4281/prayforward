@@ -8,6 +8,7 @@ import { getAnonymousUser } from '@/lib/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '@/lib/firebase';
 import Navbar from '@/components/Navbar';
+import ShareRequestModal from '@/components/ShareRequestModal';
 import Link from 'next/link';
 
 interface UserData {
@@ -24,6 +25,9 @@ export default function RequestPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [submittedRequestId, setSubmittedRequestId] = useState<string | null>(null);
+  const [submittedPrayerText, setSubmittedPrayerText] = useState<string>('');
 
   useEffect(() => {
     async function fetchUserData() {
@@ -85,16 +89,23 @@ export default function RequestPage() {
       });
 
       setSuccess(true);
+      const submittedText = prayerText.trim();
       setPrayerText('');
 
-      // Redirect to the prayer request page after a short delay
-      setTimeout(() => {
-        if (result.data && typeof result.data === 'object' && 'requestId' in result.data) {
-          router.push(`/${result.data.requestId}`);
-        } else {
+      // Get the request ID from the result
+      let requestId: string | null = null;
+      if (result.data && typeof result.data === 'object' && 'requestId' in result.data) {
+        requestId = result.data.requestId as string;
+        setSubmittedRequestId(requestId);
+        setSubmittedPrayerText(submittedText);
+        // Show share modal
+        setShowShareModal(true);
+      } else {
+        // If no request ID, redirect to pray page
+        setTimeout(() => {
           router.push('/pray');
-        }
-      }, 2000);
+        }, 2000);
+      }
     } catch (err: any) {
       console.error('Error submitting prayer request:', err);
       
@@ -202,9 +213,9 @@ export default function RequestPage() {
                   </div>
                 )}
 
-                {success && (
+                {success && !showShareModal && (
                   <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-                    Your prayer request has been submitted! Redirecting...
+                    Your prayer request has been submitted!
                   </div>
                 )}
 
@@ -220,6 +231,22 @@ export default function RequestPage() {
           )}
         </div>
       </main>
+
+      {/* Share Modal */}
+      {submittedRequestId && (
+        <ShareRequestModal
+          isOpen={showShareModal}
+          onClose={() => {
+            setShowShareModal(false);
+            // Redirect to the prayer request page after closing modal
+            setTimeout(() => {
+              router.push(`/${submittedRequestId}`);
+            }, 300);
+          }}
+          requestId={submittedRequestId}
+          prayerText={submittedPrayerText}
+        />
+      )}
     </div>
   );
 }

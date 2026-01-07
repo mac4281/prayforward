@@ -9,6 +9,7 @@ import { getSessionCount } from '@/lib/session';
 import Navbar from '@/components/Navbar';
 import PrayerForm from '@/components/PrayerForm';
 import CompanyAd from '@/components/CompanyAd';
+import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 
 interface PrayerRequest {
@@ -198,6 +199,16 @@ export default function PrayPage() {
                 </p>
               )}
             </div>
+
+            {/* Share Button */}
+            {prayerRequest.text && (
+              <div className="mt-6 flex justify-end">
+                <ShareButton 
+                  requestId={prayerRequest.id} 
+                  prayerText={prayerRequest.text}
+                />
+              </div>
+            )}
           </div>
 
           {/* Prayer Form */}
